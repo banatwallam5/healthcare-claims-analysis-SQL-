@@ -41,14 +41,13 @@ LEFT JOIN dim_organization do_ ON do_.organization_id = e.organization;
 -- ---------------------------------------------------------------------------
 INSERT INTO fact_conditions (
     patient_key, encounter_key, onset_date_key, resolved_date_key,
-    code_system, code, description
+    code, description
 )
 SELECT
     dp.patient_key,
     fe.encounter_key,
     CAST(DATE_FORMAT(c.start_dt, '%Y%m%d') AS UNSIGNED),
     CASE WHEN c.stop_dt IS NULL THEN NULL ELSE CAST(DATE_FORMAT(c.stop_dt, '%Y%m%d') AS UNSIGNED) END,
-    c.code_system,
     c.code,
     c.description
 FROM stg_conditions c
@@ -81,13 +80,12 @@ LEFT JOIN fact_encounters fe ON fe.encounter_id = m.encounter;
 -- fact_procedures
 -- ---------------------------------------------------------------------------
 INSERT INTO fact_procedures (
-    patient_key, encounter_key, date_key, code_system, code, description, base_cost
+    patient_key, encounter_key, date_key, code, description, base_cost
 )
 SELECT
     dp.patient_key,
     fe.encounter_key,
     CAST(DATE_FORMAT(p.start_ts, '%Y%m%d') AS UNSIGNED),
-    p.code_system,
     p.code,
     p.description,
     p.base_cost
@@ -124,4 +122,3 @@ UNION ALL SELECT 'fact_conditions', COUNT(*) FROM fact_conditions
 UNION ALL SELECT 'fact_medications', COUNT(*) FROM fact_medications
 UNION ALL SELECT 'fact_procedures', COUNT(*) FROM fact_procedures
 UNION ALL SELECT 'fact_observations', COUNT(*) FROM fact_observations;
-
