@@ -147,8 +147,7 @@ CREATE TABLE fact_conditions (
     encounter_key   INT UNSIGNED  NULL,
     onset_date_key  INT           NOT NULL,
     resolved_date_key INT         NULL,
-    code_system     VARCHAR(20)   NULL,
-    code            VARCHAR(20)   NULL,
+    code            VARCHAR(20)   NULL,  -- SNOMED-CT by Synthea convention; this export doesn't label it per-row
     description     VARCHAR(255)  NULL,
     PRIMARY KEY (condition_key),
     CONSTRAINT fk_cond_patient FOREIGN KEY (patient_key)   REFERENCES dim_patient (patient_key),
@@ -187,8 +186,7 @@ CREATE TABLE fact_procedures (
     patient_key     INT UNSIGNED  NOT NULL,
     encounter_key   INT UNSIGNED  NULL,
     date_key        INT           NOT NULL,
-    code_system     VARCHAR(20)   NULL,
-    code            VARCHAR(20)   NULL,
+    code            VARCHAR(20)   NULL,  -- SNOMED-CT by Synthea convention; this export doesn't label it per-row
     description     VARCHAR(255)  NULL,
     base_cost       DECIMAL(14,2) NULL,               -- additive measure
     PRIMARY KEY (procedure_key),
