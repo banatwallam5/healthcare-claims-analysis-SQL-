@@ -48,15 +48,17 @@ CREATE TABLE stg_patients (
     city                  VARCHAR(100)  NULL,
     state                 VARCHAR(100)  NULL,
     county                VARCHAR(100)  NULL,
-    fips                  VARCHAR(20)   NULL,
     zip                   VARCHAR(20)   NULL,
     lat                   DECIMAL(10,6) NULL,
     lon                   DECIMAL(10,6) NULL,
     healthcare_expenses   DECIMAL(14,2) NULL,
     healthcare_coverage   DECIMAL(14,2) NULL,
-    income                DECIMAL(14,2) NULL,
     PRIMARY KEY (id)
 );
+-- Note: this table intentionally has no FIPS or INCOME column -- the
+-- 2019-2021 "1K Sample" CSV export doesn't include them (later Synthea
+-- versions added both). If you're loading a newer export that does have
+-- them, add the columns back and extend the LOAD DATA statement in 02.
 
 -- ---------------------------------------------------------------------------
 -- organizations.csv
@@ -119,13 +121,15 @@ CREATE TABLE stg_encounters (
 
 -- ---------------------------------------------------------------------------
 -- conditions.csv  (no natural single-column PK -- composite)
+-- Note: no SYSTEM/code_system column in this export version (Synthea's
+-- older CSV exporter didn't emit it -- conditions are SNOMED-CT by
+-- convention, it's just not labeled per-row in this file).
 -- ---------------------------------------------------------------------------
 CREATE TABLE stg_conditions (
     start_dt      DATE          NULL,
     stop_dt       DATE          NULL,
     patient       CHAR(36)      NULL,
     encounter     CHAR(36)      NULL,
-    code_system   VARCHAR(20)   NULL,
     code          VARCHAR(20)   NULL,
     description   VARCHAR(255)  NULL
 );
@@ -150,14 +154,13 @@ CREATE TABLE stg_medications (
 );
 
 -- ---------------------------------------------------------------------------
--- procedures.csv
+-- procedures.csv  (same note as conditions -- no SYSTEM column here)
 -- ---------------------------------------------------------------------------
 CREATE TABLE stg_procedures (
     start_ts       DATETIME      NULL,
     stop_ts        DATETIME      NULL,
     patient        CHAR(36)      NULL,
     encounter      CHAR(36)      NULL,
-    code_system    VARCHAR(20)   NULL,
     code           VARCHAR(20)   NULL,
     description    VARCHAR(255)  NULL,
     base_cost      DECIMAL(14,2) NULL,
