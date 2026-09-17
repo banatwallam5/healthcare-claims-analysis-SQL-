@@ -124,3 +124,4 @@ UNION ALL SELECT 'fact_conditions', COUNT(*) FROM fact_conditions
 UNION ALL SELECT 'fact_medications', COUNT(*) FROM fact_medications
 UNION ALL SELECT 'fact_procedures', COUNT(*) FROM fact_procedures
 UNION ALL SELECT 'fact_observations', COUNT(*) FROM fact_observations;
+
