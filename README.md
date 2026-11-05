@@ -5,8 +5,45 @@ data, modeled as a star schema and queried in MySQL. Built to demonstrate practi
 data-analyst SQL: schema design, ETL/data cleaning, window functions, and answering
 real operational and clinical questions from patient-level data.
 
-**Status: in progress.** This README will be filled in with actual findings, screenshots,
-and numbers as the project is built. Right now it's the design doc.
+**Status: complete (v1).** All nine analysis questions below are answered, with the
+headline numbers verified directly against the source rather than taken at face value —
+see Key Findings.
+
+## Key Findings
+
+**Population and risk signals.** The ten most common clinical diagnoses are respiratory
+and minor acute conditions — viral sinusitis leads by a wide margin (739 patients, 1,233
+diagnoses, reflecting repeat episodes rather than one-off cases), followed by pharyngitis,
+bronchitis, and anemia. The parallel social-determinants-of-health cut surfaces a separate,
+equally real signal: the top finding by raw count is "full-time employment" at 13,805
+logged instances across only 834 patients — a ~16.5x ratio that tells you this field gets
+re-recorded at nearly every encounter rather than noted once, unlike a stable clinical
+diagnosis like anemia (324 diagnoses, 324 patients, exactly 1:1). Reading a diagnosis count
+without that distinction would badly misstate what either number actually means.
+
+**Cost doesn't track volume.** Among organizations with nearly identical patient volume
+(36-38 patients), average cost per encounter ranges from $2,747 to $10,357 — roughly 3.8x.
+That spread isn't a smooth gradient across five similar hospitals; it's one outlier (Saint
+Anne's Hospital) running more than 1.6x above the next-highest facility in the same volume
+band. Separately verified that the provider-level cut returns numbers numerically identical
+to the organization-level one, row for row — this dataset effectively has one provider per
+organization, so a "by provider" breakdown adds no independent signal here.
+
+![Organizations with similar patient volume show very different cost per encounter](cost_spread_chart.png)
+
+**The top spend patient is real, not a bug.** The highest-spend patient in the dataset
+totals $18.85M — about 6.4x the next-highest patient ($2.93M). Checked directly against
+the source rather than reported at face value: this patient has 412 distinct encounters
+with no duplicate rows inflating the total, so the number reflects genuinely exceptional
+care volume, not a join or load artifact.
+
+**All-cause 30-day readmissions: 35.5%.** 613 of 1,728 inpatient encounters were followed
+by another inpatient stay within 30 days. This runs well above typical published hospital
+readmission rates, which is expected given how the measure is simplified here: it's
+all-cause rather than diagnosis-matched, and includes no exclusion for planned
+readmissions — both push a simplified proxy higher than CMS's own condition-specific
+measure. A small number of 0-or-negative-gap rows come from overlapping inpatient
+encounter records in the source data; flagged in the query rather than filtered out.
 
 ## Why this project
 
@@ -68,14 +105,16 @@ transform correct."
 there so that a second export, re-loaded later, would actually accumulate patient history
 instead of silently overwriting it.
 
-See [`sql/`](./sql) for the full DDL and load scripts, run in order 01 → 05.
+See [`sql/`](./sql) for the full DDL and load scripts, run in order 01 → 05, plus the full
+analysis queries in [`sql/06_analysis_queries.sql`](./sql/06_analysis_queries.sql).
 
-## Planned analysis questions
+## Analysis questions
 
-Drawn from what the study curriculum has covered so far (joins/anti-joins, aggregation,
-CTEs, window functions, date/time analysis, CASE/pivoting) — answers and query code will
-be added here as they're built. Each question also states the business problem and
-stakeholder it's standing in for, not just the SQL technique it exercises.
+All nine are answered in [`sql/06_analysis_queries.sql`](./sql/06_analysis_queries.sql),
+each with its business framing, the stakeholder it stands in for, and — where relevant —
+an alternative that was considered and rejected, with the reasoning for why. Headline
+results are summarized in Key Findings above; this section documents the full reasoning
+behind each query.
 
 1. What are the top 10 most common diagnosed conditions, and how does prevalence differ
    by age band and gender?
@@ -201,6 +240,7 @@ stakeholder it's standing in for, not just the SQL technique it exercises.
    before moving to analysis queries.
 7. (Optional, only needed for Q9) Run `sql/07_simulate_scd_change.sql` once to
    manufacture real Type 2 SCD history for a handful of patients — see Q9 above for why.
+8. Run the analysis queries in `sql/06_analysis_queries.sql`.
 
 ## Tech
 
