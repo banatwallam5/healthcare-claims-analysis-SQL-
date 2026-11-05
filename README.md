@@ -1,13 +1,10 @@
 # Healthcare Data Analytics (Synthea)
 
-A SQL analytics project built on [Synthea](https://github.com/synthetichealth/synthea) synthetic patient
-data, modeled as a star schema and queried in MySQL. Built to demonstrate practical
-data-analyst SQL: schema design, ETL/data cleaning, window functions, and answering
+This is a SQL analytics project built on [Synthea](https://github.com/synthetichealth/synthea) synthetic patient
+data, modeled as a star schema and queried in MySQL. I built this to demonstrate practical
+data-analyst SQL: schema design, ETL/data cleaning, window functions, knowledge and the ability to answer
 real operational and clinical questions from patient-level data.
 
-**Status: complete (v1).** All nine analysis questions below are answered, with the
-headline numbers verified directly against the source rather than taken at face value —
-see Key Findings.
 
 ## Key Findings
 
